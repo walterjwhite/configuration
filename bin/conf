@@ -1,0 +1,42 @@
+#!/bin/sh
+
+. _LIBRARY_PATH_/_APPLICATION_NAME_/configuration.sh
+
+for _ARG in "$@"; do
+	case $_ARG in
+	--restore | --backup)
+		_ACTION=${_ARG#--}
+		;;
+	--git=*)
+		_CONFIGURATION_REPOSITORY="${_ARG#*=}"
+		# *)
+		#     ;;
+		;;
+	esac
+done
+
+_require "$_ACTION" _ACTION
+. _LIBRARY_PATH_/_APPLICATION_NAME_/$_ACTION.sh
+
+for _CONFIGURATION_PROVIDER in $(find _LIBRARY_PATH_/_APPLICATION_NAME_/provider -type f); do
+	_CONFIGURATION_PROVIDER_NAME=$(basename $_CONFIGURATION_PROVIDER | sed -e 's/\.sh$//')
+	_CONFIGURATION_CLEAR_KEY=$(printf '%s' $_CONFIGURATION_PROVIDER_NAME | tr '[:lower:]' '[:upper:]' | tr '-' '_')
+
+	. $_CONFIGURATION_PROVIDER
+
+	# run init if it exists
+	#_configure_plugin_init
+	type _configure_plugin_${_ACTION}_$_CONFIGURATION_PROVIDER_NAME >/dev/null 2>&1
+	if [ $? -eq 0 ]; then
+		_configure_plugin_${_ACTION}_$_CONFIGURATION_PROVIDER_NAME
+		if [ $? -eq 0 ]; then
+			continue
+		fi
+	fi
+
+	_configure_plugin_${_ACTION}
+	unset _PLUGIN_CONFIGURATION_PATH _PLUGIN_INCLUDE _PLUGIN_EXCLUDE _PLUGIN_CONFIGURATION_PATH_IS_DIR
+done
+
+_configure_plugin_${_ACTION}_sync
+

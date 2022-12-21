@@ -1,0 +1,3 @@
+_PLUGIN_CONFIGURATION_PATH=~/.config/geany
+_PLUGIN_CONFIGURATION_PATH_IS_DIR=1
+_PLUGIN_EXCLUDE="templates tags filedefs"

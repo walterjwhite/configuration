@@ -1,0 +1,5 @@
+_PLUGIN_CONFIGURATION_PATH=~/.saferc
+_PLUGIN_CONFIGURATION_PATH_IS_DIR=1
+_PLUGIN_INCLUDE=".svtoken"
+
+# ".vault-token"
