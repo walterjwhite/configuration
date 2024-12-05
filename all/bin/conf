@@ -1,0 +1,31 @@
+#!/bin/sh
+
+_REQUIRED_ARGUMENTS="_ACTION:Action to perform (backup, restore)"
+
+import .
+import git:install/extension.sh
+
+_after_each_extension() {
+	unset _PLUGIN_CONFIGURATION_PATH _PLUGIN_INCLUDE _PLUGIN_EXCLUDE _PLUGIN_CONFIGURATION_PATH_IS_DIR _PLUGIN_CONFIGURATION_PATH_IS_SKIP_PREPARE
+}
+
+_config_init
+
+case $_ACTION in
+backup | restore | clear)
+	_info "$_ACTION on $_PLATFORM"
+	_run_extensions _configure_action _after_each_extension
+
+	_configure_${_ACTION}_sync
+	;;
+user-clear)
+	_warn "Completely clearing user configuration"
+	_config_user_clear
+	;;
+compare)
+	_configure_compare "$@"
+	;;
+*)
+	_error "Invalid action: $_ACTION"
+	;;
+esac
